@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="英語日記">
+<meta name="theme-color" content="#1a1a2e">
+<title>英語日記</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #1a1a2e;
+    --surface2: #222238;
+    --border: #2e2e4a;
+    --accent: #6c63ff;
+    --accent2: #a78bfa;
+    --text: #e8e8f0;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --radius: 12px;
+    --font: -apple-system, 'Helvetica Neue', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); }
+  body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    padding: 16px 20px 12px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  header span { font-size: 13px; color: var(--text2); }
+  .tab-bar {
+    display: flex; border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 53px; z-index: 9;
+  }
+  .tab { flex: 1; padding: 11px 0; text-align: center; font-size: 13px; font-weight: 500;
+    color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+  /* Pages */
+  .page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  .page.active { display: flex; }
+
+  /* Write page */
+  #write-page { padding: 20px; gap: 16px; overflow-y: auto; }
+  .date-label { font-size: 12px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; }
+  .prompt-box {
+    background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+  }
+  .prompt-box .label { font-size: 11px; color: var(--accent2); font-weight: 600; margin-bottom: 6px; letter-spacing: 0.06em; }
+  .prompt-box p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  textarea {
+    width: 100%; min-height: 160px; background: var(--surface2);
+    border: 0.5px solid var(--border); border-radius: var(--radius);
+    padding: 14px; color: var(--text); font-size: 16px; font-family: var(--font);
+    line-height: 1.7; resize: none; outline: none; transition: border-color 0.15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+  .char-row { display: flex; justify-content: space-between; align-items: center; }
+  .char-count { font-size: 12px; color: var(--text3); }
+  .submit-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+    padding: 13px 24px; font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s; letter-spacing: -0.2px;
+  }
+  .submit-btn:active { transform: scale(0.97); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .loading { display: flex; gap: 5px; align-items: center; justify-content: center; padding: 32px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1.1s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* Feedback */
+  .feedback { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+  .fb-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .fb-section-header { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--border); }
+  .fb-icon { font-size: 15px; }
+  .fb-title { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.04em; }
+  .fb-body { padding: 12px 14px; }
+  .overall-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+  .issue-item { padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .issue-item:last-child { border-bottom: none; }
+  .issue-orig { font-size: 13px; color: var(--danger); text-decoration: line-through; margin-bottom: 4px; }
+  .issue-fixed { font-size: 13px; color: var(--success); margin-bottom: 5px; font-weight: 500; }
+  .issue-note { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .grammar-item { padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .grammar-item:last-child { border-bottom: none; }
+  .grammar-title { font-size: 13px; font-weight: 600; color: var(--accent2); margin-bottom: 5px; }
+  .grammar-exp { font-size: 12px; color: var(--text2); line-height: 1.65; margin-bottom: 6px; }
+  .grammar-ex { font-size: 12px; color: var(--text); background: var(--bg); border-radius: 6px; padding: 6px 10px; font-style: italic; }
+  .natural-text { font-size: 14px; color: var(--text); line-height: 1.75; font-style: italic; }
+
+  /* History page */
+  #history-page { overflow-y: auto; }
+  .history-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; gap: 10px; color: var(--text3); font-size: 14px; padding: 60px 20px; text-align: center; }
+  .entry-card {
+    margin: 12px 16px; background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s;
+  }
+  .entry-card:active { border-color: var(--accent); }
+  .entry-card-date { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.04em; }
+  .entry-card-text { font-size: 14px; color: var(--text); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .entry-card-badge { display: inline-block; margin-top: 8px; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(108,99,255,0.15); color: var(--accent2); }
+
+  /* Settings page */
+  #settings-page { padding: 20px; overflow-y: auto; gap: 20px; display: none; flex-direction: column; }
+  #settings-page.active { display: flex; }
+  .settings-group { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .settings-item { padding: 14px 16px; border-bottom: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-label { font-size: 13px; font-weight: 500; color: var(--text); }
+  .settings-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .settings-input {
+    width: 100%; background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px;
+    font-family: var(--font); outline: none;
+  }
+  .settings-input:focus { border-color: var(--accent); }
+  .save-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+    padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+  }
+  .save-btn:active { opacity: 0.8; }
+  .api-status { font-size: 12px; padding: 4px 0; }
+  .api-ok { color: var(--success); }
+  .api-ng { color: var(--danger); }
+
+  /* Detail modal */
+  #detail-modal {
+    display: none; position: fixed; inset: 0; background: var(--bg);
+    z-index: 100; flex-direction: column; overflow-y: auto;
+  }
+  #detail-modal.open { display: flex; }
+  .modal-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 1; }
+  .back-btn { background: none; border: none; color: var(--accent2); font-size: 15px; cursor: pointer; padding: 4px 0; }
+  .modal-date { font-size: 14px; color: var(--text2); }
+  .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 英語日記</h1>
+  <span id="today-label"></span>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('write')">書く</div>
+  <div class="tab" onclick="switchTab('history')">履歴</div>
+  <div class="tab" onclick="switchTab('settings')">設定</div>
+</div>
+
+<!-- Write page -->
+<div class="page active" id="write-page">
+  <div class="date-label" id="write-date"></div>
+  <div class="prompt-box">
+    <div class="label">TODAY'S PROMPT</div>
+    <p id="daily-prompt">Loading...</p>
+  </div>
+  <textarea id="diary-input" placeholder="Write in English... (例: Today I went to the local market and tried a new fruit.)" rows="6"></textarea>
+  <div class="char-row">
+    <span class="char-count" id="char-count">0 文字</span>
+    <button class="submit-btn" id="submit-btn" onclick="submitEntry()" disabled>フィードバックを受ける</button>
+  </div>
+  <div id="feedback-container"></div>
+</div>
+
+<!-- History page -->
+<div class="page" id="history-page">
+  <div id="history-list"></div>
+</div>
+
+<!-- Settings page -->
+<div id="settings-page" class="page">
+  <div class="settings-group">
+    <div class="settings-item">
+      <div class="settings-label">Gemini API キー</div>
+      <div class="settings-desc">Google AI Studioで発行したAPIキーを入力してください。端末内にのみ保存されます。</div>
+      <input class="settings-input" type="password" id="api-key-input" placeholder="AIza... または発行されたキー">
+      <div class="api-status" id="api-status"></div>
+    </div>
+  </div>
+  <button class="save-btn" onclick="saveSettings()">保存する</button>
+  <div class="settings-group">
+    <div class="settings-item">
+      <div class="settings-label">PWAとしてホーム画面に追加</div>
+      <div class="settings-desc">Safariで開き、下部の「共有」→「ホーム画面に追加」をタップしてください。</div>
+    </div>
+    <div class="settings-item">
+      <div class="settings-label">データについて</div>
+      <div class="settings-desc">日記データはこの端末のブラウザ（localStorage）に保存されます。アプリを削除すると消えます。</div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div id="detail-modal">
+  <div class="modal-header">
+    <button class="back-btn" onclick="closeDetail()">← 戻る</button>
+    <span class="modal-date" id="modal-date"></span>
+  </div>
+  <div class="modal-body" id="modal-body"></div>
+</div>
+
+<script>
+const PROMPTS = [
+  "Describe something that made you smile today.",
+  "What did you eat today? How did it taste?",
+  "Write about someone you talked to today.",
+  "What was the most interesting thing you saw today?",
+  "Describe your morning routine today.",
+  "What are you looking forward to this week?",
+  "Write about a challenge you faced recently.",
+  "What is something you learned today?",
+  "Describe the weather and how it affected your mood.",
+  "What would you like to do this weekend?",
+  "Write about your workspace or where you spent most of today.",
+  "What song or sound stuck in your head today?",
+  "Describe a conversation you had today.",
+  "What is one thing you want to improve about yourself?",
+  "Write about a guest or person you met recently.",
+];
+
+let entries = [];
+
+function init() {
+  const d = new Date();
+  document.getElementById('today-label').textContent = d.toLocaleDateString('ja-JP', {month:'long',day:'numeric'});
+  document.getElementById('write-date').textContent = d.toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  const promptIdx = d.getDate() % PROMPTS.length;
+  document.getElementById('daily-prompt').textContent = PROMPTS[promptIdx];
+
+  entries = JSON.parse(localStorage.getItem('eng_diary_entries') || '[]');
+
+  const savedKey = localStorage.getItem('gemini_api_key') || '';
+  document.getElementById('api-key-input').value = savedKey;
+  if (savedKey) document.getElementById('api-status').innerHTML = '<span class="api-ok">✓ キー設定済み</span>';
+
+  document.getElementById('diary-input').addEventListener('input', () => {
+    const len = document.getElementById('diary-input').value.length;
+    document.getElementById('char-count').textContent = len + ' 文字';
+    document.getElementById('submit-btn').disabled = len < 10;
+  });
+
+  renderHistory();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['write','history','settings'][i] === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(tab + '-page').classList.add('active');
+  if (tab === 'history') renderHistory();
+}
+
+function saveSettings() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { alert('APIキーを入力してください'); return; }
+  localStorage.setItem('gemini_api_key', key);
+  document.getElementById('api-status').innerHTML = '<span class="api-ok">✓ 保存しました</span>';
+}
+
+async function submitEntry() {
+  const text = document.getElementById('diary-input').value.trim();
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) { alert('設定タブでAPIキーを入力してください'); switchTab('settings'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = '分析中...';
+  document.getElementById('feedback-container').innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+  const prompt = `You are an English writing coach for a Japanese learner targeting TOEIC 900+.
+Analyze this diary entry and respond ONLY in valid JSON (no markdown, no backticks, no explanation):
+{
+  "issues": [{"original": "...", "fixed": "...", "note_ja": "..."}],
+  "grammar_points": [{"title_ja": "...", "explanation_ja": "...", "example": "..."}],
+  "natural_version": "...",
+  "overall_comment_ja": "..."
+}
+Rules:
+- issues: up to 4 unnatural/incorrect expressions. note_ja in Japanese. Empty array if none.
+- grammar_points: exactly 2-3 TOEIC-relevant grammar or structure points found in this entry. title_ja and explanation_ja in Japanese.
+- natural_version: a naturally rewritten full version by a native speaker.
+- overall_comment_ja: 2-sentence encouraging feedback in Japanese.
+
+Diary entry: "${text.replace(/"/g, '\\"')}"`;
+
+  let fb = null;
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    fb = JSON.parse(raw.replace(/```json|```/g,'').trim());
+  } catch(e) {
+    document.getElementById('feedback-container').innerHTML = `<div style="color:var(--danger);font-size:13px;padding:12px 0">エラー: ${e.message}<br>APIキーを確認してください。</div>`;
+    btn.disabled = false; btn.textContent = 'フィードバックを受ける';
+    return;
+  }
+
+  const dateStr = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  const existingIdx = entries.findIndex(e => e.date === dateStr);
+  const entry = { date: dateStr, text, feedback: fb, ts: Date.now() };
+  if (existingIdx >= 0) entries[existingIdx] = entry; else entries.unshift(entry);
+  localStorage.setItem('eng_diary_entries', JSON.stringify(entries));
+
+  showFeedback(fb);
+  btn.disabled = false; btn.textContent = 'もう一度フィードバック';
+}
+
+function showFeedback(fb) {
+  const issuesHtml = (fb.issues||[]).length > 0
+    ? (fb.issues||[]).map(i => `<div class="issue-item"><div class="issue-orig">✗ ${esc(i.original)}</div><div class="issue-fixed">✓ ${esc(i.fixed)}</div><div class="issue-note">${esc(i.note_ja)}</div></div>`).join('')
+    : '<div style="font-size:13px;color:var(--success);padding:4px 0">不自然な表現はありませんでした 👍</div>';
+
+  const grammarHtml = (fb.grammar_points||[]).map(g => `
+    <div class="grammar-item">
+      <div class="grammar-title">📌 ${esc(g.title_ja)}</div>
+      <div class="grammar-exp">${esc(g.explanation_ja)}</div>
+      <div class="grammar-ex">${esc(g.example)}</div>
+    </div>`).join('');
+
+  document.getElementById('feedback-container').innerHTML = `
+    <div class="feedback">
+      <div class="fb-section">
+        <div class="fb-section-header"><span class="fb-icon">💬</span><span class="fb-title">OVERALL COMMENT</span></div>
+        <div class="fb-body"><div class="overall-text">${esc(fb.overall_comment_ja||'')}</div></div>
+      </div>
+      <div class="fb-section">
+        <div class="fb-section-header"><span class="fb-icon">🔍</span><span class="fb-title">表現の指摘</span></div>
+        <div class="fb-body">${issuesHtml}</div>
+      </div>
+      ${fb.natural_version ? `
+      <div class="fb-section">
+        <div class="fb-section-header"><span class="fb-icon">✨</span><span class="fb-title">ネイティブ版</span></div>
+        <div class="fb-body"><div class="natural-text">${esc(fb.natural_version)}</div></div>
+      </div>` : ''}
+      <div class="fb-section">
+        <div class="fb-section-header"><span class="fb-icon">📚</span><span class="fb-title">構文解説 (TOEIC視点)</span></div>
+        <div class="fb-body">${grammarHtml}</div>
+      </div>
+    </div>`;
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (entries.length === 0) {
+    el.innerHTML = '<div class="history-empty"><div style="font-size:36px">📝</div><div>まだ日記がありません<br>「書く」タブから始めよう</div></div>';
+    return;
+  }
+  el.innerHTML = entries.map((e,i) => `
+    <div class="entry-card" onclick="openDetail(${i})">
+      <div class="entry-card-date">${e.date}</div>
+      <div class="entry-card-text">${esc(e.text)}</div>
+      ${e.feedback ? '<span class="entry-card-badge">✓ フィードバック済み</span>' : ''}
+    </div>`).join('');
+}
+
+function openDetail(i) {
+  const e = entries[i];
+  document.getElementById('modal-date').textContent = e.date;
+  let html = `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">✍️</span><span class="fb-title">あなたの英文</span></div><div class="fb-body"><div class="overall-text" style="font-style:italic">${esc(e.text)}</div></div></div>`;
+  if (e.feedback) html += buildFeedbackHtml(e.feedback);
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetail() { document.getElementById('detail-modal').classList.remove('open'); }
+
+function buildFeedbackHtml(fb) {
+  const issuesHtml = (fb.issues||[]).length > 0
+    ? (fb.issues||[]).map(i => `<div class="issue-item"><div class="issue-orig">✗ ${esc(i.original)}</div><div class="issue-fixed">✓ ${esc(i.fixed)}</div><div class="issue-note">${esc(i.note_ja)}</div></div>`).join('')
+    : '<div style="font-size:13px;color:var(--success);padding:4px 0">不自然な表現はありませんでした 👍</div>';
+  const grammarHtml = (fb.grammar_points||[]).map(g => `<div class="grammar-item"><div class="grammar-title">📌 ${esc(g.title_ja)}</div><div class="grammar-exp">${esc(g.explanation_ja)}</div><div class="grammar-ex">${esc(g.example)}</div></div>`).join('');
+  return `
+    <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">💬</span><span class="fb-title">OVERALL COMMENT</span></div><div class="fb-body"><div class="overall-text">${esc(fb.overall_comment_ja||'')}</div></div></div>
+    <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">🔍</span><span class="fb-title">表現の指摘</span></div><div class="fb-body">${issuesHtml}</div></div>
+    ${fb.natural_version ? `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">✨</span><span class="fb-title">ネイティブ版</span></div><div class="fb-body"><div class="natural-text">${esc(fb.natural_version)}</div></div></div>` : ''}
+    <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">📚</span><span class="fb-title">構文解説 (TOEIC視点)</span></div><div class="fb-body">${grammarHtml}</div></div>`;
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+init();
+</script>
+</body>
+</html>
