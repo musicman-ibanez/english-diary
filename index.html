@@ -277,6 +277,7 @@ function init() {
       if (resp.access_token) {
         accessToken = resp.access_token;
         localStorage.setItem('goog_access_token', accessToken);
+        localStorage.setItem('goog_token_expiry', Date.now() + 55 * 60 * 1000);
         updateAuthUI(true);
         ensureSheetHeaders();
         loadFromSheet();
@@ -284,11 +285,14 @@ function init() {
     },
   });
 
-  const savedToken = localStorage.getItem('goog_access_token');
-  if (savedToken) {
+const savedToken = localStorage.getItem('goog_access_token');
+  const tokenExpiry = localStorage.getItem('goog_token_expiry');
+  if (savedToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
     accessToken = savedToken;
     updateAuthUI(true);
     loadFromSheet();
+  } else if (savedToken) {
+    tokenClient.requestAccessToken({ prompt: '' });
   }
 
   renderHistory();
