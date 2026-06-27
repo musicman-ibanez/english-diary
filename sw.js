@@ -1,5 +1,5 @@
-const CACHE = 'eng-diary-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE = 'eng-diary-v3';
+const ASSETS = ['/english-diary/', '/english-diary/index.html', '/english-diary/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
