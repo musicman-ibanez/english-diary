@@ -2,7 +2,7 @@
   "name": "英語日記",
   "short_name": "英語日記",
   "description": "毎日の英語日記とAIフィードバック",
-  "start_url": "/",
+  "start_url": "/english-diary/",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#1a1a2e",
