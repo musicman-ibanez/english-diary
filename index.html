@@ -343,17 +343,14 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJsYBHAaW0kz-HLb2mog0H
 async function saveToSheet(entry) {
   try {
     const fb = entry.feedback || {};
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        date: entry.date,
-        text: entry.text,
-        natural_version: fb.natural_version || '',
-        overall_comment_ja: fb.overall_comment_ja || '',
-        issues_count: (fb.issues || []).length
-      })
+    const params = new URLSearchParams({
+      date: entry.date,
+      text: entry.text,
+      natural_version: fb.natural_version || '',
+      overall_comment_ja: fb.overall_comment_ja || '',
+      issues_count: (fb.issues || []).length
     });
+    const res = await fetch(GAS_URL + '?' + params.toString());
     const data = await res.json();
     return data.success === true;
   } catch(e) { return false; }
