@@ -1,4 +1,4 @@
-const CACHE = 'eng-diary-v3';
+const CACHE = 'eng-diary-v4';
 const ASSETS = ['/english-diary/', '/english-diary/index.html', '/english-diary/manifest.json'];
 
 self.addEventListener('install', e => {
