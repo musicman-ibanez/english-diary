@@ -338,24 +338,24 @@ async function ensureSheetHeaders() {
   } catch(e) {}
 }
 
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJsYBHAaW0kz-HLb2mog0HFQXHqcxJBAES1Bam69kvqvQoCc-NjZi0lqLffJlWJf5T/exec';
+
 async function saveToSheet(entry) {
-  if (!accessToken) return false;
   try {
     const fb = entry.feedback || {};
-    const row = [
-      entry.date,
-      entry.text,
-      fb.natural_version || '',
-      fb.overall_comment_ja || '',
-      (fb.issues || []).length,
-      new Date().toLocaleString('ja-JP')
-    ];
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:F:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, {
+    const res = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [row] })
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        date: entry.date,
+        text: entry.text,
+        natural_version: fb.natural_version || '',
+        overall_comment_ja: fb.overall_comment_ja || '',
+        issues_count: (fb.issues || []).length
+      })
     });
-    return res.ok;
+    const data = await res.json();
+    return data.success === true;
   } catch(e) { return false; }
 }
 
