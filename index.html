@@ -10,78 +10,41 @@
 <title>英語日記</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.svg">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
-    --bg: #0f0f1a;
-    --surface: #1a1a2e;
-    --surface2: #222238;
-    --border: #2e2e4a;
-    --accent: #6c63ff;
-    --accent2: #a78bfa;
-    --text: #e8e8f0;
-    --text2: #9090b0;
-    --text3: #5a5a7a;
-    --success: #34d399;
-    --warning: #fbbf24;
-    --danger: #f87171;
-    --radius: 12px;
+    --bg: #0f0f1a; --surface: #1a1a2e; --surface2: #222238;
+    --border: #2e2e4a; --accent: #6c63ff; --accent2: #a78bfa;
+    --text: #e8e8f0; --text2: #9090b0; --text3: #5a5a7a;
+    --success: #34d399; --danger: #f87171; --radius: 12px;
     --font: -apple-system, 'Helvetica Neue', sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); }
   body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
-
-  header {
-    padding: 16px 20px 12px;
-    border-bottom: 0.5px solid var(--border);
-    background: var(--surface);
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 10;
-  }
-  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
-  #login-btn {
-    background: var(--accent); color: #fff; border: none; border-radius: 8px;
-    padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
-  }
-  #login-btn.logout { background: transparent; border: 0.5px solid var(--border); color: var(--text2); }
-  #user-info { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 8px; }
-
-  .tab-bar {
-    display: flex; border-bottom: 0.5px solid var(--border);
-    background: var(--surface);
-    position: sticky; top: 53px; z-index: 9;
-  }
+  header { padding: 16px 20px 12px; border-bottom: 0.5px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  header h1 { font-size: 17px; font-weight: 600; }
+  header span { font-size: 12px; color: var(--text2); }
+  .tab-bar { display: flex; border-bottom: 0.5px solid var(--border); background: var(--surface); position: sticky; top: 53px; z-index: 9; }
   .tab { flex: 1; padding: 11px 0; text-align: center; font-size: 13px; font-weight: 500;
     color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
   .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
-
   .page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
   .page.active { display: flex; }
-
   #write-page { padding: 20px; gap: 16px; overflow-y: auto; }
   .date-label { font-size: 12px; color: var(--text3); font-weight: 500; }
-  .prompt-box {
-    background: var(--surface2); border: 0.5px solid var(--border);
-    border-radius: var(--radius); padding: 12px 14px;
-  }
+  .prompt-box { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
   .prompt-box .label { font-size: 11px; color: var(--accent2); font-weight: 600; margin-bottom: 6px; letter-spacing: 0.06em; }
   .prompt-box p { font-size: 13px; color: var(--text2); line-height: 1.6; }
-  textarea {
-    width: 100%; min-height: 160px; background: var(--surface2);
-    border: 0.5px solid var(--border); border-radius: var(--radius);
-    padding: 14px; color: var(--text); font-size: 16px; font-family: var(--font);
-    line-height: 1.7; resize: none; outline: none; transition: border-color 0.15s;
-  }
+  textarea { width: 100%; min-height: 160px; background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 14px; color: var(--text); font-size: 16px; font-family: var(--font);
+    line-height: 1.7; resize: none; outline: none; transition: border-color 0.15s; }
   textarea:focus { border-color: var(--accent); }
   textarea::placeholder { color: var(--text3); }
   .char-row { display: flex; justify-content: space-between; align-items: center; }
   .char-count { font-size: 12px; color: var(--text3); }
-  .submit-btn {
-    background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
-    padding: 13px 24px; font-size: 15px; font-weight: 600; cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
+  .submit-btn { background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+    padding: 13px 24px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
   .submit-btn:active { transform: scale(0.97); }
   .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
   .loading { display: flex; gap: 5px; align-items: center; justify-content: center; padding: 32px; }
@@ -89,7 +52,6 @@
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes pulse { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
-
   .feedback { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
   .fb-section { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .fb-section-header { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--border); }
@@ -108,71 +70,47 @@
   .grammar-exp { font-size: 12px; color: var(--text2); line-height: 1.65; margin-bottom: 6px; }
   .grammar-ex { font-size: 12px; color: var(--text); background: var(--bg); border-radius: 6px; padding: 6px 10px; font-style: italic; }
   .natural-text { font-size: 14px; color: var(--text); line-height: 1.75; font-style: italic; }
-  .save-status { font-size: 12px; text-align: center; padding: 8px 0; }
-  .save-ok { color: var(--success); }
-  .save-ng { color: var(--danger); }
-
   #history-page { overflow-y: auto; }
   .history-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
     height: 100%; gap: 10px; color: var(--text3); font-size: 14px; padding: 60px 20px; text-align: center; }
-  .entry-card {
-    margin: 12px 16px; background: var(--surface2); border: 0.5px solid var(--border);
-    border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s;
-  }
+  .entry-card { margin: 12px 16px; background: var(--surface2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s; }
   .entry-card:active { border-color: var(--accent); }
   .entry-card-date { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
   .entry-card-text { font-size: 14px; color: var(--text); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .entry-card-badge { display: inline-block; margin-top: 8px; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(108,99,255,0.15); color: var(--accent2); }
-
   #settings-page { padding: 20px; overflow-y: auto; gap: 20px; }
   .settings-group { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .settings-item { padding: 14px 16px; border-bottom: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
   .settings-item:last-child { border-bottom: none; }
   .settings-label { font-size: 13px; font-weight: 500; color: var(--text); }
   .settings-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
-  .settings-input {
-    width: 100%; background: var(--bg); border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px;
-    font-family: var(--font); outline: none;
-  }
+  .settings-input { width: 100%; background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 14px; font-family: var(--font); outline: none; }
   .settings-input:focus { border-color: var(--accent); }
-  .save-btn {
-    background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
-    padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
-  }
+  .save-btn { background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+    padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; }
   .api-status { font-size: 12px; }
   .api-ok { color: var(--success); }
-
-  #detail-modal {
-    display: none; position: fixed; inset: 0; background: var(--bg);
-    z-index: 100; flex-direction: column; overflow-y: auto;
-  }
+  #detail-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; overflow-y: auto; }
   #detail-modal.open { display: flex; }
   .modal-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px;
     border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 1; }
   .back-btn { background: none; border: none; color: var(--accent2); font-size: 15px; cursor: pointer; padding: 4px 0; }
   .modal-date { font-size: 14px; color: var(--text2); }
   .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-
-  .login-gate { display: flex; flex-direction: column; align-items: center; justify-content: center;
-    height: 200px; gap: 12px; color: var(--text2); font-size: 14px; text-align: center; padding: 20px; }
 </style>
 </head>
 <body>
-
 <header>
   <h1>📖 英語日記</h1>
-  <div id="auth-area">
-    <button id="login-btn" onclick="handleLogin()">Googleでログイン</button>
-  </div>
+  <span id="today-label"></span>
 </header>
-
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('write')">書く</div>
   <div class="tab" onclick="switchTab('history')">履歴</div>
   <div class="tab" onclick="switchTab('settings')">設定</div>
 </div>
-
 <div class="page active" id="write-page">
   <div class="date-label" id="write-date"></div>
   <div class="prompt-box">
@@ -186,11 +124,9 @@
   </div>
   <div id="feedback-container"></div>
 </div>
-
 <div class="page" id="history-page">
   <div id="history-list"></div>
 </div>
-
 <div class="page" id="settings-page">
   <div class="settings-group">
     <div class="settings-item">
@@ -204,7 +140,17 @@
   <div class="settings-group" style="margin-top:0">
     <div class="settings-item">
       <div class="settings-label">データの保存先</div>
-      <div class="settings-desc">日記はGoogleスプレッドシートに自動保存されます。ログインすると有効になります。</div>
+      <div class="settings-desc">日記はこの端末内に保存されます。機種変更時はCSVエクスポートで移行してください。</div>
+    </div>
+    <div class="settings-item">
+      <div class="settings-label">CSVエクスポート</div>
+      <div class="settings-desc">日記データをCSVファイルとして書き出します。</div>
+      <button class="save-btn" style="margin-top:4px" onclick="exportCSV()">CSVをダウンロード</button>
+    </div>
+    <div class="settings-item">
+      <div class="settings-label">CSVインポート</div>
+      <div class="settings-desc">以前エクスポートしたCSVファイルを読み込みます。</div>
+      <button class="save-btn" style="margin-top:4px" onclick="importCSV()">CSVを読み込む</button>
     </div>
     <div class="settings-item">
       <div class="settings-label">ホーム画面に追加</div>
@@ -212,7 +158,6 @@
     </div>
   </div>
 </div>
-
 <div id="detail-modal">
   <div class="modal-header">
     <button class="back-btn" onclick="closeDetail()">← 戻る</button>
@@ -220,12 +165,7 @@
   </div>
   <div class="modal-body" id="modal-body"></div>
 </div>
-
 <script>
-const CLIENT_ID = '116276518816-t820cgclq3rh73lck4m3hhvgtu9pe6dp.apps.googleusercontent.com';
-const SHEET_ID = '1foeXJ5YUeJ8viFOMhu8-o7oIdUFSg5K-5oiEoVsBeX4';
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-
 const PROMPTS = [
   "Describe something that made you smile today.",
   "What did you eat today? How did it taste?",
@@ -244,143 +184,23 @@ const PROMPTS = [
   "Write about a guest or person you met recently.",
 ];
 
-let accessToken = null;
 let entries = [];
-let tokenClient = null;
 
 function init() {
   const d = new Date();
+  document.getElementById('today-label').textContent = d.toLocaleDateString('ja-JP', {month:'long',day:'numeric'});
   document.getElementById('write-date').textContent = d.toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
   document.getElementById('daily-prompt').textContent = PROMPTS[d.getDate() % PROMPTS.length];
-
+  entries = JSON.parse(localStorage.getItem('eng_diary_entries') || '[]');
   const savedKey = localStorage.getItem('gemini_api_key') || '';
   document.getElementById('api-key-input').value = savedKey;
   if (savedKey) document.getElementById('api-status').innerHTML = '<span class="api-ok">✓ キー設定済み</span>';
-
-  entries = JSON.parse(localStorage.getItem('eng_diary_entries') || '[]');
-
   document.getElementById('diary-input').addEventListener('input', () => {
     const len = document.getElementById('diary-input').value.length;
     document.getElementById('char-count').textContent = len + ' 文字';
     document.getElementById('submit-btn').disabled = len < 10;
   });
-
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: onSignIn,
-  });
-
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    callback: (resp) => {
-      if (resp.access_token) {
-        accessToken = resp.access_token;
-        localStorage.setItem('goog_access_token', accessToken);
-        localStorage.setItem('goog_token_expiry', Date.now() + 55 * 60 * 1000);
-        updateAuthUI(true);
-        ensureSheetHeaders();
-        loadFromSheet();
-      }
-    },
-  });
-
-const savedToken = localStorage.getItem('goog_access_token');
-  const tokenExpiry = localStorage.getItem('goog_token_expiry');
-  if (savedToken && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
-    accessToken = savedToken;
-    updateAuthUI(true);
-    loadFromSheet();
-  } else if (savedToken) {
-    tokenClient.requestAccessToken({ prompt: '' });
-  }
-
   renderHistory();
-}
-
-function handleLogin() {
-  if (accessToken) {
-    accessToken = null;
-    localStorage.removeItem('goog_access_token');
-    updateAuthUI(false);
-  } else {
-    tokenClient.requestAccessToken();
-  }
-}
-
-function onSignIn(resp) {}
-
-function updateAuthUI(loggedIn) {
-  const btn = document.getElementById('login-btn');
-  if (loggedIn) {
-    btn.textContent = 'ログアウト';
-    btn.className = 'logout';
-  } else {
-    btn.textContent = 'Googleでログイン';
-    btn.className = '';
-  }
-}
-
-async function ensureSheetHeaders() {
-  if (!accessToken) return;
-  try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:F1`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    const data = await res.json();
-    if (!data.values || data.values[0]?.[0] !== '日付') {
-      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A1:F1?valueInputOption=RAW`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ values: [['日付', '英文', 'ネイティブ版', '全体コメント', '指摘数', '登録日時']] })
-      });
-    }
-  } catch(e) {}
-}
-
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJsYBHAaW0kz-HLb2mog0HFQXHqcxJBAES1Bam69kvqvQoCc-NjZi0lqLffJlWJf5T/exec';
-
-async function saveToSheet(entry) {
-  try {
-    const fb = entry.feedback || {};
-    const params = new URLSearchParams({
-      date: entry.date,
-      text: entry.text,
-      natural_version: fb.natural_version || '',
-      overall_comment_ja: fb.overall_comment_ja || '',
-      issues_count: (fb.issues || []).length
-    });
-    const res = await fetch(GAS_URL + '?' + params.toString());
-    const data = await res.json();
-    return data.success === true;
-  } catch(e) { return false; }
-}
-
-async function loadFromSheet() {
-  if (!accessToken) return;
-  try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A2:F`, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    const data = await res.json();
-    if (data.values && data.values.length > 0) {
-      const sheetEntries = data.values.map(row => ({
-        date: row[0] || '',
-        text: row[1] || '',
-        feedback: { natural_version: row[2]||'', overall_comment_ja: row[3]||'' }
-      })).reverse();
-      entries = sheetEntries;
-      localStorage.setItem('eng_diary_entries', JSON.stringify(entries));
-      renderHistory();
-    }
-  } catch(e) {}
-}
-
-function saveSettings() {
-  const key = document.getElementById('api-key-input').value.trim();
-  if (!key) { alert('APIキーを入力してください'); return; }
-  localStorage.setItem('gemini_api_key', key);
-  document.getElementById('api-status').innerHTML = '<span class="api-ok">✓ 保存しました</span>';
 }
 
 function switchTab(tab) {
@@ -390,15 +210,68 @@ function switchTab(tab) {
   if (tab === 'history') renderHistory();
 }
 
+function saveSettings() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { alert('APIキーを入力してください'); return; }
+  localStorage.setItem('gemini_api_key', key);
+  document.getElementById('api-status').innerHTML = '<span class="api-ok">✓ 保存しました</span>';
+}
+
+function exportCSV() {
+  if (entries.length === 0) { alert('日記がありません'); return; }
+  const header = ['日付', '英文', 'ネイティブ版', '全体コメント', '指摘数'];
+  const rows = entries.map(e => {
+    const fb = e.feedback || {};
+    return [e.date, e.text, fb.natural_version||'', fb.overall_comment_ja||'', (fb.issues||[]).length]
+      .map(v => '"' + String(v).replace(/"/g,'""') + '"');
+  });
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '英語日記.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importCSV() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const lines = ev.target.result.split('\n').slice(1);
+      let count = 0;
+      lines.forEach(line => {
+        if (!line.trim()) return;
+        const cols = line.match(/(".*?"|[^,]+)(?=,|$)/g) || [];
+        const clean = cols.map(c => c.replace(/^"|"$/g,'').replace(/""/g,'"'));
+        if (!clean[0]) return;
+        const entry = { date: clean[0], text: clean[1]||'', feedback: {
+          natural_version: clean[2]||'', overall_comment_ja: clean[3]||'', issues: []
+        }, ts: Date.now() };
+        const idx = entries.findIndex(e => e.date === entry.date);
+        if (idx >= 0) entries[idx] = entry; else entries.unshift(entry);
+        count++;
+      });
+      localStorage.setItem('eng_diary_entries', JSON.stringify(entries));
+      renderHistory();
+      alert(count + '件インポートしました');
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
+  input.click();
+}
+
 async function submitEntry() {
   const text = document.getElementById('diary-input').value.trim();
   const apiKey = localStorage.getItem('gemini_api_key');
   if (!apiKey) { alert('設定タブでAPIキーを入力してください'); switchTab('settings'); return; }
-
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = '分析中...';
   document.getElementById('feedback-container').innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-
   const prompt = `You are an English writing coach for a Japanese learner targeting TOEIC 900+.
 Analyze this diary entry and respond ONLY in valid JSON (no markdown, no backticks):
 {
@@ -412,7 +285,6 @@ Analyze this diary entry and respond ONLY in valid JSON (no markdown, no backtic
 - natural_version: naturally rewritten full version.
 - overall_comment_ja: 2-sentence encouraging feedback in Japanese.
 Diary entry: "${text.replace(/"/g,'\\"')}"`;
-
   let fb = null;
   try {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -429,23 +301,13 @@ Diary entry: "${text.replace(/"/g,'\\"')}"`;
     btn.disabled = false; btn.textContent = 'フィードバックを受ける';
     return;
   }
-
   const dateStr = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
   const entry = { date: dateStr, text, feedback: fb, ts: Date.now() };
   const existingIdx = entries.findIndex(e => e.date === dateStr);
   if (existingIdx >= 0) entries[existingIdx] = entry; else entries.unshift(entry);
   localStorage.setItem('eng_diary_entries', JSON.stringify(entries));
-
   showFeedback(fb);
   btn.disabled = false; btn.textContent = 'もう一度フィードバック';
-
-  if (accessToken) {
-    const saved = await saveToSheet(entry);
-    const statusEl = document.createElement('div');
-    statusEl.className = 'save-status ' + (saved ? 'save-ok' : 'save-ng');
-    statusEl.textContent = saved ? '✓ スプレッドシートに保存しました' : '⚠ シート保存に失敗（端末には保存済み）';
-    document.getElementById('feedback-container').prepend(statusEl);
-  }
 }
 
 function showFeedback(fb) {
@@ -498,9 +360,17 @@ function openDetail(i) {
   const e = entries[i];
   document.getElementById('modal-date').textContent = e.date;
   let html = `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">✍️</span><span class="fb-title">あなたの英文</span></div><div class="fb-body"><div class="overall-text" style="font-style:italic">${esc(e.text)}</div></div></div>`;
-  if (e.feedback && e.feedback.overall_comment_ja) {
-    html += `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">💬</span><span class="fb-title">OVERALL COMMENT</span></div><div class="fb-body"><div class="overall-text">${esc(e.feedback.overall_comment_ja)}</div></div></div>`;
-    if (e.feedback.natural_version) html += `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">✨</span><span class="fb-title">ネイティブ版</span></div><div class="fb-body"><div class="natural-text">${esc(e.feedback.natural_version)}</div></div></div>`;
+  if (e.feedback) {
+    const fb = e.feedback;
+    const issuesHtml = (fb.issues||[]).length > 0
+      ? (fb.issues||[]).map(i => `<div class="issue-item"><div class="issue-orig">✗ ${esc(i.original)}</div><div class="issue-fixed">✓ ${esc(i.fixed)}</div><div class="issue-note">${esc(i.note_ja)}</div></div>`).join('')
+      : '<div style="font-size:13px;color:var(--success)">不自然な表現はありませんでした 👍</div>';
+    const grammarHtml = (fb.grammar_points||[]).map(g => `<div class="grammar-item"><div class="grammar-title">📌 ${esc(g.title_ja)}</div><div class="grammar-exp">${esc(g.explanation_ja)}</div><div class="grammar-ex">${esc(g.example)}</div></div>`).join('');
+    html += `
+      <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">💬</span><span class="fb-title">OVERALL COMMENT</span></div><div class="fb-body"><div class="overall-text">${esc(fb.overall_comment_ja||'')}</div></div></div>
+      <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">🔍</span><span class="fb-title">表現の指摘</span></div><div class="fb-body">${issuesHtml}</div></div>
+      ${fb.natural_version ? `<div class="fb-section"><div class="fb-section-header"><span class="fb-icon">✨</span><span class="fb-title">ネイティブ版</span></div><div class="fb-body"><div class="natural-text">${esc(fb.natural_version)}</div></div></div>` : ''}
+      <div class="fb-section"><div class="fb-section-header"><span class="fb-icon">📚</span><span class="fb-title">構文解説 (TOEIC視点)</span></div><div class="fb-body">${grammarHtml}</div></div>`;
   }
   document.getElementById('modal-body').innerHTML = html;
   document.getElementById('detail-modal').classList.add('open');
@@ -510,7 +380,7 @@ function closeDetail() { document.getElementById('detail-modal').classList.remov
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-window.onload = init;
+init();
 </script>
 </body>
 </html>
